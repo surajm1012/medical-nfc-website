@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediTag - NFC Medical Information</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #f97316;
+      --light: #f3f4f6;
+      --dark: #1f2937;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    header {
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    
+    .logo-icon {
+      margin-right: 8px;
+      color: var(--secondary);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background-color: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--light);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+    }
+    
+    main {
+      padding: 2rem 0;
+    }
+    
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+    }
+    
+    .hero-content {
+      flex: 1;
+      padding-right: 2rem;
+    }
+    
+    .hero-image {
+      flex: 1;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+    
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--dark);
+    }
+    
+    p {
+      margin-bottom: 1rem;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.25rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    
+    .error-message {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-col {
+      flex: 1;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+    
+    .alert-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .badge-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .badge-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    
+    .badge-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+    
+    footer {
+      background-color: var(--dark);
+      color: white;
+      padding: 2rem 0;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .footer-column h3 {
+      color: white;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-column ul {
+      list-style: none;
+    }
+    
+    .footer-column ul li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer-column ul li a {
+      color: #9ca3af;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-column ul li a:hover {
+      color: white;
+    }
+    
+    .tab-container {
+      margin-bottom: 2rem;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #d1d5db;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+    }
+    
+    .tab.active {
+      border-bottom-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .medical-profile {
+      margin-bottom: 2rem;
+    }
+    
+    .medical-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .medical-item {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem;
+      flex: 1 0 calc(33.333% - 1rem);
+      min-width: 250px;
+    }
+    
+    .medical-item-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .medical-contacts {
+      margin-top: 2rem;
+    }
+    
+    .contact-card {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .contact-info {
+      margin-left: 1rem;
+    }
+    
+    .contact-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .contact-relation {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .contact-phone {
+      display: flex;
+      align-items: center;
+    }
+    
+    .icon {
+      margin-right: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+      }
+      
+      .hero-content {
+        padding-right: 0;
+        margin-bottom: 2rem;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">
+          <span class="logo-icon">📱</span> MediTag
+        </div>
+        <div class="nav-links">
+          <a href="#" onclick="showHome()">Home</a>
+          <a href="#" onclick="showSetup()">Setup Profile</a>
+          <a href="#" onclick="showMedicalView()">Medical View</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Home Section -->
+    <section id="home">
+      <div class="hero">
+        <div class="hero-content">
+          <h1>Emergency Medical Information at Your Fingertips</h1>
+          <p>MediTag allows you to store critical medical information on an NFC chip that can be instantly accessed by medical professionals in emergency situations.</p>
+          <button class="btn" onclick="showSetup()">Set Up Your Profile</button>
+        </div>
+        <div class="hero-image">
+          <img src="/api/placeholder/400/320" alt="MediTag NFC Medical Information Demo">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>How It Works</h2>
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem; text-align: center;">
+          <div style="flex: 1;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📝</div>
+            <h3>1. Fill Your Profile</h3>
+            <p>Enter your important medical information securely in our system.</p>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+            <h3>2. Program Your NFC Tag</h3>
+            <p>We'll program your NFC wristband, card or sticker with your unique ID.</p>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">🏥</div>
+            <h3>3. Emergency Access</h3>
+            <p>Medical professionals can scan your tag to instantly access your vital information.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <h2>Why Choose MediTag?</h2>
+        <div class="card" style="margin-top: 1rem;">
+          <h3>Instant Access in Emergencies</h3>
+          <p>When seconds count, medical professionals can immediately access your critical health information with just a tap of your NFC tag.</p>
+        </div>
+        <div class="card">
+          <h3>Privacy and Security</h3>
+          <p>Your information is encrypted and can only be accessed by authorized medical personnel using our secure system.</p>
+        </div>
+        <div class="card">
+          <h3>Easy to Update</h3>
+          <p>As your medical situation changes, you can easily update your information through our website or app.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setup Profile Section -->
+    <section id="setup" style="display: none;">
+      <h1>Set Up Your Medical Profile</h1>
+      <p>Fill out the information below to create your medical profile. This information will be stored securely and accessible via your NFC tag.</p>
+
+      <div class="tab-container">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('personal')">Personal Info</div>
+          <div class="tab" onclick="switchTab('medical')">Medical Info</div>
+          <div class="tab" onclick="switchTab('emergency')">Emergency Contacts</div>
+          <div class="tab" onclick="switchTab('review')">Review</div>
+        </div>
+
+        <div id="personal-tab" class="tab-content active">
+          <div class="card">
+            <h2>Personal Information</h2>
+            <form id="personal-form">
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="firstName">First Name*</label>
+                    <input type="text" id="firstName" required>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="lastName">Last Name*</label>
+                    <input type="text" id="lastName" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="dob">Date of Birth*</label>
+                    <input type="date" id="dob" required>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                      <option value="">Select One</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                      <option value="prefer-not">Prefer not to say</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address">
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="state">State/Province</label>
+                    <input type="text" id="state">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="zip">Postal Code</label>
+                    <input type="text" id="zip">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="phone">Phone Number*</label>
+                    <input type="tel" id="phone" required>
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="language">Preferred Language</label>
+                <select id="language">
+                  <option value="english">English</option>
+                  <option value="spanish">Spanish</option>
+                  <option value="french">French</option>
+                  <option value="german">German</option>
+                  <option value="chinese">Chinese</option>
+                  <option value="japanese">Japanese</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                <button type="button" class="btn" onclick="nextTab('medical')">Next: Medical Info</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="medical-tab" class="tab-content">
+          <div class="card">
+            <h2>Medical Information</h2>
+            <form id="medical-form">
+              <div class="form-group">
+                <label for="bloodType">Blood Type</label>
+                <select id="bloodType">
+                  <option value="">Unknown</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="height">Height</label>
+                    <input type="text" id="height" placeholder="e.g., 5'10" or 178cm">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input type="text" id="weight" placeholder="e.g., 160lbs or 73kg">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="allergies">Allergies</label>
+                <textarea id="allergies" rows="3" placeholder="List all allergies, especially medications and food allergies"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="medications">Current Medications</label>
+                <textarea id="medications" rows="3" placeholder="List all current medications, dosages, and frequency"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="conditions">Medical Conditions</label>
+                <textarea id="conditions" rows="3" placeholder="List major medical conditions like diabetes, heart disease, epilepsy, etc."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="procedures">Previous Surgeries/Procedures</label>
+                <textarea id="procedures" rows="3" placeholder="List relevant surgeries or medical procedures with dates if known"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="implants">Medical Implants</label>
+                <textarea id="implants" rows="2" placeholder="List any implanted medical devices (pacemaker, artificial joints, etc.)"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="insurance">Insurance Information</label>
+                <textarea id="insurance" rows="2" placeholder="Provider, policy number, group number, etc."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="primaryDoctor">Primary Doctor/Physician</label>
+                <input type="text" id="primaryDoctor" placeholder="Name and contact information">
+              </div>
+
+              <div class="form-group">
+                <label for="additionalInfo">Additional Important Information</label>
+                <textarea id="additionalInfo" rows="3" placeholder="Any other critical medical information first responders should know"></textarea>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                <button type="button" class="btn btn-secondary" onclick="nextTab('personal')">Previous: Personal Info</button>
+                <button type="button" class="btn" onclick="nextTab('emergency')">Next: Emergency Contacts</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="emergency-tab" class="tab-content">
+          <div class="card">
+            <h2>Emergency Contacts</h2>
+            <p>Add at least one emergency contact who should be notified in case of an emergency.</p>
+
+            <div id="contacts-container">
+              <div class="contact-form" id="contact-1">
+                <h3>Emergency Contact #1</h3>
+                <div class="form-row">
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="contact1Name">Full Name*</label>
+                      <input type="text" id="contact1Name" required>
+                    </div>
+                  </div>
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="contact1Relation">Relationship*</label>
+                      <input type="text" id="contact1Relation" placeholder="e.g., Spouse, Parent, Friend" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="contact1Phone">Phone Number*</label>
+                      <input type="tel" id="contact1Phone" required>
+                    </div>
+                  </div>
+                  <div class="form-col">
+                    <div class="form-group">
+                      <label for="contact1Email">Email</label>
+                      <input type="email" id="contact1Email">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+              <button type="button" class="btn btn-secondary" id="addContactBtn" onclick="addContact()">+ Add Another Contact</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+              <button type="button" class="btn btn-secondary" onclick="nextTab('medical')">Previous: Medical Info</button>
+              <button type="button" class="btn" onclick="nextTab('review')">Next: Review</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="review-tab" class="tab-content">
+          <div class="card">
+            <h2>Review Your Information</h2>
+            <p>Please review all the information you've entered before finalizing your profile.</p>
+
+            <div id="review-content" style="margin-top: 1.5rem;">
+              <h3>Personal Information</h3>
+              <div class="review-section" style="margin-bottom: 2rem;">
+                <div id="review-personal">
+                  <!-- Will be populated with JavaScript -->
+                  <p>Complete the personal information tab to see your data here.</p>
+                </div>
+              </div>
+
+              <h3>Medical Information</h3>
+              <div class="review-section" style="margin-bottom: 2rem;">
+                <div id="review-medical">
+                  <!-- Will be populated with JavaScript -->
+                  <p>Complete the medical information tab to see your data here.</p>
+                </div>
+              </div>
+
+              <h3>Emergency Contacts</h3>
+              <div class="review-section">
+                <div id="review-contacts">
+                  <!-- Will be populated with JavaScript -->
+                  <p>Complete the emergency contacts tab to see your data here.</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+              <button type="button" class="btn btn-secondary" onclick="nextTab('emergency')">Previous: Emergency Contacts</button>
+              <button type="button" class="btn btn-success" onclick="saveProfile()">Save Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Medical Professional View Section -->
+    <section id="medical-view" style="display: none;">
+      <div class="alert alert-success" style="display: flex; align-items: center;">
+        <div style="margin-right: 1rem; font-size: 1.5rem;">✓</div>
+        <div>
+          <strong>NFC Tag Successfully Scanned</strong>
+          <p style="margin: 0;">Patient medical information loaded successfully.</p>
+        </div>
+      </div>
+
+      <div class="medical-profile card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 id="patient-name">Patient: John Doe</h2>
+          <span class="badge badge-success" id="last-updated">Updated: Mar 15, 2025</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <p><strong>Date of Birth:</strong> <span id="patient-dob">January 15, 1975</span> (<span id="patient-age">50</span> years)</p>
+          </div>
+          <div class="form-col">
+            <p><strong>Blood Type:</strong> <span id="patient-blood">A+</span></p>
+          </div>
+          <div class="form-col">
+            <p><strong>Gender:</strong> <span id="patient-gender">Male</span></p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <p><strong>Height:</strong> <span id="patient-height">5'10"</span></p>
+          </div>
+          <div class="form-col">
+            <p><strong>Weight:</strong> <span id="patient-weight">175 lbs</span></p>
+          </div>
+          <div class="form-col">
+            <p><strong>Language:</strong> <span id="patient-language">English</span></p>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 2rem;">Critical Medical Information</h3>
+      
+      <div class="medical-info">
+        <div class="medical-item">
+          <div class="medical-item-title">Allergies</div>
+          <div id="patient-allergies">
+            <span class="badge badge-danger">Penicillin</span>
+            <span class="badge badge-danger">Shellfish</span>
+            <span class="badge badge-danger">Peanuts</span>
+          </div>
+        </div>
+
+        <div class="medical-item">
+          <div class="medical-item-title">Medical Conditions</div>
+          <div id="patient-conditions">
+            <span class="badge badge-warning">Type 2 Diabetes</span>
+            <span class="badge badge-warning">Hypertension</span>
+            <span class="badge badge-warning">Asthma</span>
+          </div>
+        </div>
+
+        <div class="medical-item">
+          <div class="medical-item-title">Medical Implants</div>
+          <div id="patient-implants">
+            <span class="badge badge-warning">Pacemaker (Medtronic, 2021)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="medical-info">
+        <div class="medical-item">
+          <div class="medical-item-title">Current Medications</div>
+          <ul id="patient-medications" style="padding-left: 1.5rem;">
+            <li>Metformin 500mg, twice daily</li>
+            <li>Lisinopril 10mg, once daily</li>
+            <li>Albuterol inhaler, as needed</li>
+            <li>Aspirin 81mg, once daily</li>
+          </ul>
+        </div>
+
+        <div class="medical-item">
+          <div class="medical-item-title">Previous Procedures</div>
+          <ul id="patient-procedures" style="padding-left: 1.5rem;">
+            <li>Appendectomy (2010)</li>
+            <li>Pacemaker Implantation (2021)</li>
+            <li>Right Knee Arthroscopy (2019)</li>
+          </ul>
+        </div>
+
+        <div class="medical-item">
+          <div class="medical-item-title">Additional Information</div>
+          <p id="patient-additional">Patient requires glasses for reading. Has history of fainting when blood is drawn. Hearing difficulty in right ear.</p>
+        </div>
+      </div>
+
+      <div class="medical-contacts">
+        <h3>Emergency Contacts</h3>
+        
+        <div class="contact-card">
+          <div style="font-size: 2rem;">👤</div>
+          <div class="contact-info">
+            <div class="contact-name" id="ec1-name">Sarah Doe</div>
+            <div class="contact-relation" id="ec1-relation">Spouse</div>
+            <div class="contact-phone">
+              <span class="icon">📱</span>
+              <span id="ec1-phone">(555) 123-4567</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <div style="font-size: 2rem;">👤</div>
+          <div class="contact-info">
+            <div class="contact-name" id="ec2-name">Michael Doe</div>
+            <div class="contact-relation" id="ec2-relation">Son</div>
+            <div class="contact-phone">
+              <span class="icon">📱</span>
+              <span id="ec2-phone">(555) 987-6543</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; display: flex; justify-content: space-between;">
+        <button class="btn btn-secondary" onclick="showHome()">Back to Home</button>
+        <button class="btn btn-primary" onclick="printMedicalInfo()">Print Information</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div class="logo" style="margin-bottom: 1rem;">
+            <span class="logo-icon">📱</span> MediTag
+          </div>
+          <p>Emergency medical information accessible through NFC technology.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h3>Company</h3>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Contact</a></li>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Services</h3>
+            <ul>
+              <li><a href="#">Personal Tags</a></li>
+              <li><a href="#">Family Plans</a></li>
+              <li><a href="#">Healthcare Providers</a></li>
+              <li><a href="#">Organizations</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Support</h3>
+            <ul>
+              <li><a href="#">FAQs</a></li>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 2rem; text-align: center; color: #9ca3af;">
+        <p>&copy; 2025 MediTag. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Global variables to store user data
+    let userData = {
+      personal: {},
+      medical: {},
+      contacts: []
+    };
+    
+    // Show different sections
+    function showHome() {
+      document.getElementById('home').style.display = 'block';
+      document.getElementById('setup').style.display = 'none';
+      document.getElementById('medical-view').style.display = 'none';
+    }
+    
+    function showSetup() {
+      document.getElementById('home').style.display = 'none';
+      document.getElementById('setup').style.display = 'block';
+      document.getElementById('medical-view').style.display = 'none';
+    }
+    
+    function showMedicalView() {
+      document.getElementById('home').style.display = 'none';
+      document.getElementById('setup').style.display = 'none';
+      document.getElementById('medical-view').style.display = 'block';
+      
+      // Check if we have saved data to display
+      const savedData = localStorage.getItem('meditagUserData');
+      if (savedData) {
+        displaySavedData(JSON.parse(savedData));
+      }
+    }
+    
+    // Tab switching functionality
+    function switchTab(tabName) {
+      // Hide all tab content
+      const tabContents = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+      }
+      
+      // Deactivate all tabs
+      const tabs = document.getElementsByClassName('tab');
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+      }
+      
+      // Activate the selected tab
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      // Find the tab button and activate it
+      const tabButtons = document.getElementsByClassName('tab');
+      for (let i = 0; i < tabButtons.length; i++) {
+        if (tabButtons[i].getAttribute('onclick').includes(tabName)) {
+          tabButtons[i].classList.add('active');
+        }
+      }
+      
+      // If switching to review tab, update the review content
+      if (tabName === 'review') {
+        updateReview();
+      }
+    }
+    
+    // Navigate to next tab
+    function nextTab(tabName) {
+      // Save current tab data
+      if (tabName === 'medical') {
+        savePersonalData();
+      } else if (tabName === 'emergency') {
+        saveMedicalData();
+      } else if (tabName === 'review') {
+        saveContactData();
+      } else if (tabName === 'personal') {
+        // Going back, no need to save
+      }
+      
+      switchTab(tabName);
+    }
+    
+    // Save personal data
+    function savePersonalData() {
+      userData.personal = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        dob: document.getElementById('dob').value,
+        gender: document.getElementById('gender').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        zip: document.getElementById('zip').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        language: document.getElementById('language').value
+      };
+    }
+    
+    // Save medical data
+    function saveMedicalData() {
+      userData.medical = {
+        bloodType: document.getElementById('bloodType').value,
+        height: document.getElementById('height').value,
+        weight: document.getElementById('weight').value,
+        allergies: document.getElementById('allergies').value,
+        medications: document.getElementById('medications').value,
+        conditions: document.getElementById('conditions').value,
+        procedures: document.getElementById('procedures').value,
+        implants: document.getElementById('implants').value,
+        insurance: document.getElementById('insurance').value,
+        primaryDoctor: document.getElementById('primaryDoctor').value,
+        additionalInfo: document.getElementById('additionalInfo').value
+      };
+    }
+    
+    // Save contact data
+    function saveContactData() {
+      userData.contacts = [];
+      
+      // Get all contact forms
+      const contactForms = document.getElementsByClassName('contact-form');
+      for (let i = 0; i < contactForms.length; i++) {
+        const id = contactForms[i].id.split('-')[1];
+        userData.contacts.push({
+          name: document.getElementById(`contact${id}Name`).value,
+          relation: document.getElementById(`contact${id}Relation`).value,
+          phone: document.getElementById(`contact${id}Phone`).value,
+          email: document.getElementById(`contact${id}Email`) ? document.getElementById(`contact${id}Email`).value : ''
+        });
+      }
+    }
+    
+    // Add new contact form
+    let contactCount = 1;
+    function addContact() {
+      contactCount++;
+      const contactsContainer = document.getElementById('contacts-container');
+      
+      const newContact = document.createElement('div');
+      newContact.className = 'contact-form';
+      newContact.id = `contact-${contactCount}`;
+      newContact.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>Emergency Contact #${contactCount}</h3>
+          <button type="button" class="btn btn-danger" onclick="removeContact(${contactCount})" style="padding: 0.25rem 0.5rem;">Remove</button>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="contact${contactCount}Name">Full Name*</label>
+              <input type="text" id="contact${contactCount}Name" required>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="contact${contactCount}Relation">Relationship*</label>
+              <input type="text" id="contact${contactCount}Relation" placeholder="e.g., Spouse, Parent, Friend" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="contact${contactCount}Phone">Phone Number*</label>
+              <input type="tel" id="contact${contactCount}Phone" required>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="contact${contactCount}Email">Email</label>
+              <input type="email" id="contact${contactCount}Email">
+            </div>
+          </div>
+        </div>
+      `;
+      
+      contactsContainer.appendChild(newContact);
+    }
+    
+    // Remove a contact form
+    function removeContact(id) {
+      const contactElement = document.getElementById(`contact-${id}`);
+      contactElement.remove();
+    }
+    
+    // Update review tab content
+    function updateReview() {
+      // Update personal section
+      let personalHTML = '';
+      if (userData.personal.firstName) {
+        personalHTML = `
+          <p><strong>Name:</strong> ${userData.personal.firstName} ${userData.personal.lastName}</p>
+          <p><strong>Date of Birth:</strong> ${formatDate(userData.personal.dob)}</p>
+          <p><strong>Gender:</strong> ${userData.personal.gender}</p>
+          <p><strong>Contact:</strong> ${userData.personal.phone}${userData.personal.email ? ` | ${userData.personal.email}` : ''}</p>
+          <p><strong>Address:</strong> ${formatAddress(userData.personal)}</p>
+          <p><strong>Preferred Language:</strong> ${userData.personal.language}</p>
+        `;
+      } else {
+        personalHTML = '<p>Complete the personal information tab to see your data here.</p>';
+      }
+      document.getElementById('review-personal').innerHTML = personalHTML;
+      
+      // Update medical section
+      let medicalHTML = '';
+      if (userData.medical.bloodType || userData.medical.conditions) {
+        medicalHTML = `
+          <p><strong>Blood Type:</strong> ${userData.medical.bloodType || 'Not specified'}</p>
+          <p><strong>Height/Weight:</strong> ${userData.medical.height || 'Not specified'} / ${userData.medical.weight || 'Not specified'}</p>
+          <p><strong>Allergies:</strong> ${userData.medical.allergies || 'None specified'}</p>
+          <p><strong>Medical Conditions:</strong> ${userData.medical.conditions || 'None specified'}</p>
+          <p><strong>Current Medications:</strong> ${userData.medical.medications || 'None specified'}</p>
+          <p><strong>Previous Procedures:</strong> ${userData.medical.procedures || 'None specified'}</p>
+          <p><strong>Medical Implants:</strong> ${userData.medical.implants || 'None specified'}</p>
+          <p><strong>Additional Information:</strong> ${userData.medical.additionalInfo || 'None specified'}</p>
+        `;
+      } else {
+        medicalHTML = '<p>Complete the medical information tab to see your data here.</p>';
+      }
+      document.getElementById('review-medical').innerHTML = medicalHTML;
+      
+      // Update contacts section
+      let contactsHTML = '';
+      if (userData.contacts.length > 0) {
+        contactsHTML = '<ul style="list-style: none; padding: 0;">';
+        for (let i = 0; i < userData.contacts.length; i++) {
+          const contact = userData.contacts[i];
+          contactsHTML += `
+            <li style="margin-bottom: 1rem;">
+              <p><strong>Name:</strong> ${contact.name} (${contact.relation})</p>
+              <p><strong>Phone:</strong> ${contact.phone}</p>
+              ${contact.email ? `<p><strong>Email:</strong> ${contact.email}</p>` : ''}
+            </li>
+          `;
+        }
+        contactsHTML += '</ul>';
+      } else {
+        contactsHTML = '<p>Complete the emergency contacts tab to see your data here.</p>';
+      }
+      document.getElementById('review-contacts').innerHTML = contactsHTML;
+    }
+    
+    // Save the complete profile
+    function saveProfile() {
+      // Add timestamp
+      userData.lastUpdated = new Date().toISOString();
+      
+      // Save to localStorage (in a real app, this would be sent to a server)
+      localStorage.setItem('meditagUserData', JSON.stringify(userData));
+      
+      // Show success message
+      alert('Your medical profile has been saved successfully! Your NFC tag is now ready to be programmed.');
+      
+      // Redirect to medical view
+      showMedicalView();
+    }
+    
+    // Display saved data in the medical view
+    function displaySavedData(data) {
+      // Update patient basic info
+      document.getElementById('patient-name').textContent = `Patient: ${data.personal.firstName || 'John'} ${data.personal.lastName || 'Doe'}`;
+      document.getElementById('patient-dob').textContent = formatDate(data.personal.dob) || 'January 15, 1975';
+      
+      // Calculate age
+      const age = data.personal.dob ? calculateAge(data.personal.dob) : '50';
+      document.getElementById('patient-age').textContent = age;
+      
+      document.getElementById('patient-gender').textContent = data.personal.gender || 'Male';
+      document.getElementById('patient-blood').textContent = data.medical.bloodType || 'A+';
+      document.getElementById('patient-height').textContent = data.medical.height || '5\'10"';
+      document.getElementById('patient-weight').textContent = data.medical.weight || '175 lbs';
+      document.getElementById('patient-language').textContent = data.personal.language || 'English';
+      
+      // Format updated date
+      const updatedDate = data.lastUpdated ? new Date(data.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Mar 15, 2025';
+      document.getElementById('last-updated').textContent = `Updated: ${updatedDate}`;
+      
+      // Update allergies
+      if (data.medical.allergies) {
+        const allergies = data.medical.allergies.split(',').map(a => a.trim());
+        let allergiesHTML = '';
+        allergies.forEach(allergy => {
+          if (allergy) {
+            allergiesHTML += `<span class="badge badge-danger">${allergy}</span> `;
+          }
+        });
+        document.getElementById('patient-allergies').innerHTML = allergiesHTML || '<p>No known allergies</p>';
+      }
+      
+      // Update medical conditions
+      if (data.medical.conditions) {
+        const conditions = data.medical.conditions.split(',').map(c => c.trim());
+        let conditionsHTML = '';
+        conditions.forEach(condition => {
+          if (condition) {
+            conditionsHTML += `<span class="badge badge-warning">${condition}</span> `;
+          }
+        });
+        document.getElementById('patient-conditions').innerHTML = conditionsHTML || '<p>No conditions listed</p>';
+      }
+      
+      // Update implants
+      if (data.medical.implants) {
+        const implants = data.medical.implants.split(',').map(i => i.trim());
+        let implantsHTML = '';
+        implants.forEach(implant => {
+          if (implant) {
+            implantsHTML += `<span class="badge badge-warning">${implant}</span> `;
+          }
+        });
+        document.getElementById('patient-implants').innerHTML = implantsHTML || '<p>No implants listed</p>';
+      }
+      
+      // Update medications
+      if (data.medical.medications) {
+        const medications = data.medical.medications.split('\n');
+        let medicationsHTML = '<ul style="padding-left: 1.5rem;">';
+        medications.forEach(medication => {
+          if (medication.trim()) {
+            medicationsHTML += `<li>${medication.trim()}</li>`;
+          }
+        });
+        medicationsHTML += '</ul>';
+        document.getElementById('patient-medications').innerHTML = medicationsHTML || '<p>No medications listed</p>';
+      }
+      
+      // Update procedures
+      if (data.medical.procedures) {
+        const procedures = data.medical.procedures.split('\n');
+        let proceduresHTML = '<ul style="padding-left: 1.5rem;">';
+        procedures.forEach(procedure => {
+          if (procedure.trim()) {
+            proceduresHTML += `<li>${procedure.trim()}</li>`;
+          }
+        });
+        proceduresHTML += '</ul>';
+        document.getElementById('patient-procedures').innerHTML = proceduresHTML || '<p>No procedures listed</p>';
+      }
+      
+      // Update additional info
+      document.getElementById('patient-additional').textContent = data.medical.additionalInfo || 'Patient requires glasses for reading. Has history of fainting when blood is drawn. Hearing difficulty in right ear.';
+      
+      // Update emergency contacts
+      if (data.contacts && data.contacts.length > 0) {
+        // Clear existing contacts
+        const contactsSection = document.querySelector('.medical-contacts');
+        let contactsHTML = '<h3>Emergency Contacts</h3>';
+        
+        // Add new contacts
+        for (let i = 0; i < Math.min(data.contacts.length, 2); i++) {
+          const contact = data.contacts[i];
+          contactsHTML += `
+            <div class="contact-card">
+              <div style="font-size: 2rem;">👤</div>
+              <div class="contact-info">
+                <div class="contact-name">${contact.name || 'Contact Name'}</div>
+                <div class="contact-relation">${contact.relation || 'Relation'}</div>
+                <div class="contact-phone">
+                  <span class="icon">📱</span>
+                  <span>${contact.phone || '(555) 123-4567'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        contactsSection.innerHTML = contactsHTML;
+      }
+    }
+    
+    // Utility functions
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    
+    function formatAddress(personal) {
+      let address = personal.address || '';
+      if (personal.city || personal.state || personal.zip) {
+        address += ', ';
+        address += personal.city || '';
+        address += personal.state ? `, ${personal.state}` : '';
+        address += personal.zip ? ` ${personal.zip}` : '';
+      }
+      return address || 'Not specified';
+    }
+    
+    function calculateAge(dob) {
+      const birthDate = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      return age;
+    }
+    
+    function printMedicalInfo() {
+      window.print();
+    }
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if we have saved data
+      const savedData = localStorage.getItem('meditagUserData');
+      if (savedData) {
+        userData = JSON.parse(savedData);
+        
+        // Populate form fields if needed
+        if (window.location.hash === '#setup') {
+          // Populate personal fields
+          const personal = userData.personal;
+          if (personal) {
+            for (const key in personal) {
+              const element = document.getElementById(key);
+              if (element) {
+                element.value = personal[key];
+              }
+            }
+          }
+          
+          // Populate medical fields
+          const medical = userData.medical;
+          if (medical) {
+            for (const key in medical) {
+              const element = document.getElementById(key);
+              if (element) {
+                element.value = medical[key];
+              }
+            }
+          }
+          
+          // Populate contact fields
+          const contacts = userData.contacts;
+          if (contacts && contacts.length > 0) {
+            // First contact is already there
+            document.getElementById('contact1Name').value = contacts[0].name || '';
+            document.getElementById('contact1Relation').value = contacts[0].relation || '';
+            document.getElementById('contact1Phone').value = contacts[0].phone || '';
+            document.getElementById('contact1Email').value = contacts[0].email || '';
+            
+            // Add additional contacts
+            for (let i = 1; i < contacts.length; i++) {
+              addContact();
+              document.getElementById(`contact${i+1}Name`).value = contacts[i].name || '';
+              document.getElementById(`contact${i+1}Relation`).value = contacts[i].relation || '';
+              document.getElementById(`contact${i+1}Phone`).value = contacts[i].phone || '';
+              document.getElementById(`contact${i+1}Email`).value = contacts[i].email || '';
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
